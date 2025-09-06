@@ -126,7 +126,7 @@ export default function SeoAnalyzer() {
                       )}
                     />
                   </div>
-                  <div className="flex items-end">
+                  <div className="flex items-center mt-2">
                     <Button 
                       type="submit" 
                       disabled={analyzeMutation.isPending}

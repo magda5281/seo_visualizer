@@ -53,59 +53,166 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     return `${passCount}/${checks.length} checks passed`;
   };
 
+  // Calculate overall check statistics
+  const getAllCheckStats = () => {
+    const allChecks = [
+      ...result.checks.title,
+      ...result.checks.metaDescription,
+      ...result.checks.openGraph,
+      ...result.checks.twitterCards,
+    ];
+    
+    return {
+      passed: allChecks.filter(check => check.status === "pass").length,
+      warnings: allChecks.filter(check => check.status === "warning").length,
+      failed: allChecks.filter(check => check.status === "fail").length,
+      total: allChecks.length,
+    };
+  };
+
+  const getScoreDescription = (score: number) => {
+    if (score >= 90) return "Excellent";
+    if (score >= 80) return "Very Good";
+    if (score >= 70) return "Good";
+    if (score >= 60) return "Fair";
+    if (score >= 50) return "Poor";
+    return "Very Poor";
+  };
+
+  const stats = getAllCheckStats();
+
   return (
     <div className="space-y-8">
-      {/* SEO Score Overview */}
+      {/* SEO Summary */}
       <Card>
         <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-foreground">SEO Analysis Results</h3>
-            <div className="text-right">
-              <div className="text-sm text-muted-foreground">Overall SEO Score</div>
-              <div className="text-3xl font-bold text-primary" data-testid="text-seo-score">
-                {result.score}
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
+            {/* Circular Progress and Score */}
+            <div className="flex items-center gap-6">
+              <div className="relative">
+                <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                  {/* Background circle */}
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="54"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    fill="transparent"
+                    className="text-muted-foreground/20"
+                  />
+                  {/* Progress circle */}
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="54"
+                    stroke={result.score >= 80 ? '#10b981' : result.score >= 60 ? '#f59e0b' : '#ef4444'}
+                    strokeWidth="6"
+                    fill="transparent"
+                    strokeDasharray={`${(result.score / 100) * 339.29} 339.29`}
+                    strokeLinecap="round"
+                    className="transition-all duration-1000"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-foreground" data-testid="text-seo-score">
+                      {result.score}
+                    </div>
+                    <div className="text-sm text-muted-foreground">/100</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground mb-1">Overall SEO Score</div>
+                <div className="text-xl font-semibold text-foreground">{getScoreDescription(result.score)}</div>
+              </div>
+            </div>
+
+            {/* SEO Summary Title */}
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold text-foreground mb-6">SEO Summary</h3>
+              
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Passed Checks */}
+                <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-500" />
+                    <span className="text-sm font-medium text-green-800 dark:text-green-200">Passed Checks</span>
+                  </div>
+                  <div className="text-2xl font-bold text-green-900 dark:text-green-100" data-testid="text-passed-checks">
+                    {stats.passed}
+                  </div>
+                </div>
+
+                {/* Warnings */}
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-500" />
+                    <span className="text-sm font-medium text-amber-800 dark:text-amber-200">Warnings</span>
+                  </div>
+                  <div className="text-2xl font-bold text-amber-900 dark:text-amber-100" data-testid="text-warnings">
+                    {stats.warnings}
+                  </div>
+                </div>
+
+                {/* Failed Checks */}
+                <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <XCircle className="w-5 h-5 text-red-600 dark:text-red-500" />
+                    <span className="text-sm font-medium text-red-800 dark:text-red-200">Failed Checks</span>
+                  </div>
+                  <div className="text-2xl font-bold text-red-900 dark:text-red-100" data-testid="text-failed-checks">
+                    {stats.failed}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-muted rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-foreground">Title Tags</span>
-                {getStatusIcon(getOverallStatus(result.checks.title))}
+
+          {/* Category Breakdown */}
+          <div className="mt-8 pt-6 border-t border-border">
+            <h4 className="text-lg font-semibold text-foreground mb-4">Category Breakdown</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-muted rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-foreground">Title Tags</span>
+                  {getStatusIcon(getOverallStatus(result.checks.title))}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {getCategoryStats(result.checks.title)}
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground">
-                {getCategoryStats(result.checks.title)}
+              
+              <div className="bg-muted rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-foreground">Meta Description</span>
+                  {getStatusIcon(getOverallStatus(result.checks.metaDescription))}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {getCategoryStats(result.checks.metaDescription)}
+                </div>
               </div>
-            </div>
-            
-            <div className="bg-muted rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-foreground">Meta Description</span>
-                {getStatusIcon(getOverallStatus(result.checks.metaDescription))}
+              
+              <div className="bg-muted rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-foreground">Open Graph</span>
+                  {getStatusIcon(getOverallStatus(result.checks.openGraph))}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {getCategoryStats(result.checks.openGraph)}
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground">
-                {getCategoryStats(result.checks.metaDescription)}
-              </div>
-            </div>
-            
-            <div className="bg-muted rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-foreground">Open Graph</span>
-                {getStatusIcon(getOverallStatus(result.checks.openGraph))}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {getCategoryStats(result.checks.openGraph)}
-              </div>
-            </div>
-            
-            <div className="bg-muted rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-foreground">Twitter Cards</span>
-                {getStatusIcon(getOverallStatus(result.checks.twitterCards))}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {getCategoryStats(result.checks.twitterCards)}
+              
+              <div className="bg-muted rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-foreground">Twitter Cards</span>
+                  {getStatusIcon(getOverallStatus(result.checks.twitterCards))}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {getCategoryStats(result.checks.twitterCards)}
+                </div>
               </div>
             </div>
           </div>
