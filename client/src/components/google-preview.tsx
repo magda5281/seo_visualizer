@@ -23,12 +23,15 @@ export default function GooglePreview({ result }: GooglePreviewProps) {
           <div className="text-xs text-green-600 mb-1" data-testid="text-google-url">
             {getDisplayUrl(result.url)}
           </div>
-          <h4 
-            className="text-lg text-blue-600 hover:underline cursor-pointer mb-1" 
+          <a 
+            href={result.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-lg text-blue-600 hover:underline cursor-pointer mb-1 block" 
             data-testid="text-google-title"
           >
             {result.title || "No title available"}
-          </h4>
+          </a>
           <p className="text-sm text-gray-600" data-testid="text-google-description">
             {result.metaDescription || "No meta description available"}
           </p>

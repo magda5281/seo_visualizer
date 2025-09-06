@@ -16,6 +16,7 @@ type TabType = "google" | "social";
 
 export default function AnalysisResults({ result }: AnalysisResultsProps) {
   const [activeTab, setActiveTab] = useState<TabType>("google");
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
   const getStatusIcon = (status: SeoCheckResult['status']) => {
     switch (status) {
@@ -81,22 +82,45 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
   const stats = getAllCheckStats();
 
+  const toggleSection = (sectionKey: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey]
+    }));
+  };
+
+  const getMainCheckMessage = (checks: SeoCheckResult[], categoryName: string) => {
+    const failedChecks = checks.filter(check => check.status === "fail");
+    const warningChecks = checks.filter(check => check.status === "warning");
+    const passedChecks = checks.filter(check => check.status === "pass");
+
+    if (failedChecks.length > 0) {
+      return failedChecks[0].message;
+    } else if (warningChecks.length > 0) {
+      return warningChecks[0].message;
+    } else if (passedChecks.length > 0) {
+      return passedChecks[0].message;
+    }
+    return `${categoryName} analysis completed`;
+  };
+
   return (
     <div className="space-y-8">
+      
       {/* SEO Summary */}
       <Card>
         <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8">
             {/* Circular Progress and Score */}
-            <div className="flex items-center gap-6">
-              <div className="relative">
+            <div className="flex sm:flex-col   items-center gap-6">
+              <div className="relative ">
                 <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
                   {/* Background circle */}
                   <circle
                     cx="60"
                     cy="60"
                     r="54"
-                    stroke="currentColor"
+                    stroke="#CCCCCC"
                     strokeWidth="6"
                     fill="transparent"
                     className="text-muted-foreground/20"
@@ -130,13 +154,13 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
             </div>
 
             {/* SEO Summary Title */}
-            <div className="flex-1">
+            <div className="flex-1 w-full">
               <h3 className="text-2xl font-bold text-foreground mb-6">SEO Summary</h3>
               
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Passed Checks */}
-                <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 ">
                   <div className="flex items-center gap-3 mb-2">
                     <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-500" />
                     <span className="text-sm font-medium text-green-800 dark:text-green-200">Passed Checks</span>
@@ -271,7 +295,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                 
                 {/* Title Tag Analysis */}
                 <div className="border border-border rounded-lg p-5">
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       {getStatusIcon(getOverallStatus(result.checks.title))}
                       <h4 className="text-lg font-semibold text-foreground">Title Tag</h4>
@@ -279,34 +303,51 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     {getStatusBadge(getOverallStatus(result.checks.title))}
                   </div>
                   
-                  {result.title && (
-                    <div className="bg-muted rounded-lg p-4 mb-4">
-                      <div className="text-sm text-muted-foreground mb-1">Current Title</div>
-                      <div className="font-medium text-foreground" data-testid="text-current-title">
-                        {result.title}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-2">
-                        Length: {result.title.length} characters
+                  <div className="text-sm text-muted-foreground mb-3">
+                    {getMainCheckMessage(result.checks.title, "Title Tag")}
+                  </div>
+                  
+                  <button
+                    onClick={() => toggleSection('title')}
+                    className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    {expandedSections['title'] ? 'Hide details' : 'Show details'}
+                  </button>
+
+                  {expandedSections['title'] && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      {result.title && (
+                        <div className="bg-muted rounded-lg p-4 mb-4">
+                          <div className="text-sm text-muted-foreground mb-1">Current Title</div>
+                          <div className="font-medium text-foreground" data-testid="text-current-title">
+                            {result.title}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-2">
+                            Length: {result.title.length} characters
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="space-y-3">
+                        {result.checks.title.map((check, index) => (
+                          <div key={index} className="flex items-start space-x-3">
+                            {getStatusIcon(check.status)}
+                            <div className="flex-1">
+                              <div className="text-sm text-foreground">{check.message}</div>
+                              {check.recommendation && (
+                                <div className="text-xs text-muted-foreground mt-1">{check.recommendation}</div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
-
-                  {result.checks.title.map((check, index) => (
-                    <div key={index} className="flex items-start space-x-3 mb-3 last:mb-0">
-                      {getStatusIcon(check.status)}
-                      <div className="flex-1">
-                        <div className="text-sm text-foreground">{check.message}</div>
-                        {check.recommendation && (
-                          <div className="text-xs text-muted-foreground mt-1">{check.recommendation}</div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
                 </div>
 
                 {/* Meta Description Analysis */}
                 <div className="border border-border rounded-lg p-5">
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       {getStatusIcon(getOverallStatus(result.checks.metaDescription))}
                       <h4 className="text-lg font-semibold text-foreground">Meta Description</h4>
@@ -314,34 +355,51 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     {getStatusBadge(getOverallStatus(result.checks.metaDescription))}
                   </div>
                   
-                  {result.metaDescription && (
-                    <div className="bg-muted rounded-lg p-4 mb-4">
-                      <div className="text-sm text-muted-foreground mb-1">Current Description</div>
-                      <div className="font-medium text-foreground" data-testid="text-current-description">
-                        {result.metaDescription}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-2">
-                        Length: {result.metaDescription.length} characters
+                  <div className="text-sm text-muted-foreground mb-3">
+                    {getMainCheckMessage(result.checks.metaDescription, "Meta Description")}
+                  </div>
+                  
+                  <button
+                    onClick={() => toggleSection('meta')}
+                    className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    {expandedSections['meta'] ? 'Hide details' : 'Show details'}
+                  </button>
+
+                  {expandedSections['meta'] && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      {result.metaDescription && (
+                        <div className="bg-muted rounded-lg p-4 mb-4">
+                          <div className="text-sm text-muted-foreground mb-1">Current Description</div>
+                          <div className="font-medium text-foreground" data-testid="text-current-description">
+                            {result.metaDescription}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-2">
+                            Length: {result.metaDescription.length} characters
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="space-y-3">
+                        {result.checks.metaDescription.map((check, index) => (
+                          <div key={index} className="flex items-start space-x-3">
+                            {getStatusIcon(check.status)}
+                            <div className="flex-1">
+                              <div className="text-sm text-foreground">{check.message}</div>
+                              {check.recommendation && (
+                                <div className="text-xs text-muted-foreground mt-1">{check.recommendation}</div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
-
-                  {result.checks.metaDescription.map((check, index) => (
-                    <div key={index} className="flex items-start space-x-3 mb-3 last:mb-0">
-                      {getStatusIcon(check.status)}
-                      <div className="flex-1">
-                        <div className="text-sm text-foreground">{check.message}</div>
-                        {check.recommendation && (
-                          <div className="text-xs text-muted-foreground mt-1">{check.recommendation}</div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
                 </div>
 
                 {/* Open Graph Tags */}
                 <div className="border border-border rounded-lg p-5">
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       {getStatusIcon(getOverallStatus(result.checks.openGraph))}
                       <h4 className="text-lg font-semibold text-foreground">Open Graph Tags</h4>
@@ -349,22 +407,39 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     {getStatusBadge(getOverallStatus(result.checks.openGraph))}
                   </div>
                   
-                  {result.checks.openGraph.map((check, index) => (
-                    <div key={index} className="flex items-start space-x-3 mb-3 last:mb-0">
-                      {getStatusIcon(check.status)}
-                      <div className="flex-1">
-                        <div className="text-sm text-foreground">{check.message}</div>
-                        {check.recommendation && (
-                          <div className="text-xs text-muted-foreground mt-1">{check.recommendation}</div>
-                        )}
+                  <div className="text-sm text-muted-foreground mb-3">
+                    {getMainCheckMessage(result.checks.openGraph, "Open Graph Tags")}
+                  </div>
+                  
+                  <button
+                    onClick={() => toggleSection('og')}
+                    className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    {expandedSections['og'] ? 'Hide details' : 'Show details'}
+                  </button>
+
+                  {expandedSections['og'] && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <div className="space-y-3">
+                        {result.checks.openGraph.map((check, index) => (
+                          <div key={index} className="flex items-start space-x-3">
+                            {getStatusIcon(check.status)}
+                            <div className="flex-1">
+                              <div className="text-sm text-foreground">{check.message}</div>
+                              {check.recommendation && (
+                                <div className="text-xs text-muted-foreground mt-1">{check.recommendation}</div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
 
                 {/* Twitter Cards */}
                 <div className="border border-border rounded-lg p-5">
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       {getStatusIcon(getOverallStatus(result.checks.twitterCards))}
                       <h4 className="text-lg font-semibold text-foreground">Twitter Cards</h4>
@@ -372,17 +447,34 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     {getStatusBadge(getOverallStatus(result.checks.twitterCards))}
                   </div>
                   
-                  {result.checks.twitterCards.map((check, index) => (
-                    <div key={index} className="flex items-start space-x-3 mb-3 last:mb-0">
-                      {getStatusIcon(check.status)}
-                      <div className="flex-1">
-                        <div className="text-sm text-foreground">{check.message}</div>
-                        {check.recommendation && (
-                          <div className="text-xs text-muted-foreground mt-1">{check.recommendation}</div>
-                        )}
+                  <div className="text-sm text-muted-foreground mb-3">
+                    {getMainCheckMessage(result.checks.twitterCards, "Twitter Cards")}
+                  </div>
+                  
+                  <button
+                    onClick={() => toggleSection('twitter')}
+                    className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    {expandedSections['twitter'] ? 'Hide details' : 'Show details'}
+                  </button>
+
+                  {expandedSections['twitter'] && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <div className="space-y-3">
+                        {result.checks.twitterCards.map((check, index) => (
+                          <div key={index} className="flex items-start space-x-3">
+                            {getStatusIcon(check.status)}
+                            <div className="flex-1">
+                              <div className="text-sm text-foreground">{check.message}</div>
+                              {check.recommendation && (
+                                <div className="text-xs text-muted-foreground mt-1">{check.recommendation}</div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
 
