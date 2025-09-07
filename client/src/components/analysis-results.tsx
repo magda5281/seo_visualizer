@@ -489,7 +489,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                       </svg>
-                      Show Raw Tags
+                      {expandedSections['rawTags'] ? 'Hide Raw Tags' : 'Show Raw Tags'}
                     </button>
                   </div>
                   
@@ -497,7 +497,8 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     {Object.keys(result.allMetaTags || {}).length} meta tags found
                   </div>
                   
-                  {result.allMetaTags && Object.keys(result.allMetaTags).length > 0 && (
+                  {/* List View - shown when rawTags is NOT expanded */}
+                  {!expandedSections['rawTags'] && result.allMetaTags && Object.keys(result.allMetaTags).length > 0 && (
                     <div className="space-y-2">
                       {Object.entries(result.allMetaTags).map(([key, value]) => (
                         <div key={key} className="bg-muted rounded-lg p-3 border-l-2 border-blue-500">
@@ -514,25 +515,24 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     </div>
                   )}
 
+                  {/* Raw Tags View - shown when rawTags IS expanded */}
                   {expandedSections['rawTags'] && (
-                    <div className="mt-4 pt-4 border-t border-border">
-                      <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto">
-                        <pre className="text-green-400 text-sm">
-                          {result.allMetaTags && Object.entries(result.allMetaTags).map(([key, value]) => 
-                            key === 'title' 
-                              ? `<title>${value}</title>`
-                              : key.startsWith('http-equiv:')
-                              ? `<meta http-equiv="${key.replace('http-equiv:', '')}" content="${value}" />`
-                              : key.startsWith('og:') || key.startsWith('twitter:') || key.startsWith('fb:')
-                              ? `<meta property="${key}" content="${value}" />`
-                              : key === 'charset'
-                              ? `<meta charset="${value}" />`
-                              : key === 'canonical'
-                              ? `<link rel="canonical" href="${value}" />`
-                              : `<meta name="${key}" content="${value}" />`
-                          ).join('\n')}
-                        </pre>
-                      </div>
+                    <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                      <pre className="text-green-400 text-sm">
+                        {result.allMetaTags && Object.entries(result.allMetaTags).map(([key, value]) => 
+                          key === 'title' 
+                            ? `<title>${value}</title>`
+                            : key.startsWith('http-equiv:')
+                            ? `<meta http-equiv="${key.replace('http-equiv:', '')}" content="${value}" />`
+                            : key.startsWith('og:') || key.startsWith('twitter:') || key.startsWith('fb:')
+                            ? `<meta property="${key}" content="${value}" />`
+                            : key === 'charset'
+                            ? `<meta charset="${value}" />`
+                            : key === 'canonical'
+                            ? `<link rel="canonical" href="${value}" />`
+                            : `<meta name="${key}" content="${value}" />`
+                        ).join('\n')}
+                      </pre>
                     </div>
                   )}
                 </div>
