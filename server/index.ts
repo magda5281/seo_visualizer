@@ -2,6 +2,24 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+// Validate critical environment variables
+function validateEnvironment(): void {
+  const requiredVars = ['NODE_ENV'];
+  const missingVars = requiredVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    console.error(`Missing required environment variables: ${missingVars.join(', ')}`);
+    process.exit(1);
+  }
+
+  // SESSION_SECRET is recommended but not required for this SEO analysis app
+  if (!process.env.SESSION_SECRET && process.env.NODE_ENV === 'production') {
+    console.warn('WARNING: SESSION_SECRET environment variable is not set. This is recommended for production deployments.');
+    // Generate a default session secret for basic functionality
+    process.env.SESSION_SECRET = 'default-session-secret-' + Date.now();
+  }
+}
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -36,36 +54,83 @@ app.use((req, res, next) => {
   next();
 });
 
+// Initialize server with comprehensive error handling
 (async () => {
-  const server = await registerRoutes(app);
+  try {
+    // Validate environment variables first
+    validateEnvironment();
+    
+    console.log('Starting server initialization...');
+    
+    // Register routes
+    const server = await registerRoutes(app);
+    console.log('Routes registered successfully');
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    // Global error handler
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+      
+      console.error('Request error:', { status, message, stack: err.stack });
+      res.status(status).json({ message });
+    });
 
-    res.status(status).json({ message });
-    throw err;
-  });
+    // Setup development or production environment
+    if (app.get("env") === "development") {
+      console.log('Setting up Vite for development...');
+      await setupVite(app, server);
+    } else {
+      console.log('Setting up static file serving for production...');
+      serveStatic(app);
+    }
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+    // Parse port with validation
+    const portEnv = process.env.PORT || '5000';
+    const port = parseInt(portEnv, 10);
+    
+    if (isNaN(port) || port <= 0 || port > 65535) {
+      throw new Error(`Invalid PORT value: ${portEnv}. Port must be a number between 1 and 65535.`);
+    }
+
+    // Start server with explicit host binding for Cloud Run compatibility
+    server.listen({
+      port,
+      host: "0.0.0.0", // Explicitly bind to all interfaces for Cloud Run
+      reusePort: true,
+    }, () => {
+      console.log(`✅ Server successfully started`);
+      console.log(`🌐 Listening on http://0.0.0.0:${port}`);
+      console.log(`📝 Environment: ${process.env.NODE_ENV}`);
+      log(`serving on port ${port}`);
+    });
+
+    // Handle server errors
+    server.on('error', (err: any) => {
+      console.error('❌ Server error:', err);
+      if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${port} is already in use. Please use a different port.`);
+      } else if (err.code === 'EACCES') {
+        console.error(`Permission denied for port ${port}. Try using a port number above 1024.`);
+      }
+      process.exit(1);
+    });
+
+  } catch (error) {
+    console.error('❌ Fatal error during server startup:');
+    console.error(error);
+    console.error('Server failed to start. Please check your configuration and try again.');
+    process.exit(1);
   }
-
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
 })();
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
+});
