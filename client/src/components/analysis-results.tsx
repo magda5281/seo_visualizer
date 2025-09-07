@@ -161,7 +161,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
   };
 
   const getPriorityRecommendations = () => {
-    const recommendations = [];
+    const recommendations: { title: string; description: string; priority: number }[] = [];
     const issues = getAttentionNeeded();
     
     issues.forEach((issue, index) => {
@@ -173,6 +173,47 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     });
 
     return recommendations.slice(0, 3); // Top 3 priorities
+  };
+
+  // Category breakdown helpers
+  const getSearchEngineOptimizationStats = () => {
+    const searchEngineChecks = [
+      ...result.checks.title,
+      ...result.checks.metaDescription,
+    ];
+    
+    const passed = searchEngineChecks.filter(check => check.status === "pass").length;
+    const warnings = searchEngineChecks.filter(check => check.status === "warning").length;
+    const failed = searchEngineChecks.filter(check => check.status === "fail").length;
+    const total = searchEngineChecks.length;
+    
+    const score = total > 0 ? Math.round((passed / total) * 100) : 0;
+    
+    return { passed, warnings, failed, total, score };
+  };
+
+  const getSocialMediaOptimizationStats = () => {
+    const socialMediaChecks = [
+      ...result.checks.openGraph,
+      ...result.checks.twitterCards,
+    ];
+    
+    const passed = socialMediaChecks.filter(check => check.status === "pass").length;
+    const warnings = socialMediaChecks.filter(check => check.status === "warning").length;
+    const failed = socialMediaChecks.filter(check => check.status === "fail").length;
+    const total = socialMediaChecks.length;
+    
+    const score = total > 0 ? Math.round((passed / total) * 100) : 0;
+    
+    return { passed, warnings, failed, total, score };
+  };
+
+  const getCategoryDescription = (score: number) => {
+    if (score >= 90) return "Excellent";
+    if (score >= 80) return "Very Good";
+    if (score >= 60) return "Good";
+    if (score >= 40) return "Fair";
+    return "Needs Improvement";
   };
 
   return (
@@ -264,6 +305,155 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     <p className="text-sm text-green-700 dark:text-green-300">No critical issues found! Your SEO is looking good.</p>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Category Breakdown */}
+      <Card>
+        <CardContent className="p-6">
+          <h2 className="text-2xl font-bold text-foreground mb-6">Category Breakdown</h2>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Search Engine Optimization */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M15.5 14h-.79l-.28-.27A6.5 6.5 0 1 0 13.5 14h.79l.28.27 4.5 4.5 1.41-1.41-4.5-4.5-.28-.27zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/>
+                </svg>
+                <h3 className="text-lg font-semibold text-foreground">Search Engine Optimization</h3>
+                <Badge className="ml-auto" variant={getSearchEngineOptimizationStats().score >= 80 ? "default" : getSearchEngineOptimizationStats().score >= 60 ? "secondary" : "destructive"}>
+                  {getCategoryDescription(getSearchEngineOptimizationStats().score)}
+                </Badge>
+              </div>
+              
+              <div className="flex items-center gap-6">
+                {/* Circular Progress for Search Engine */}
+                <div className="relative flex-shrink-0">
+                  <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 120 120">
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="54"
+                      stroke="#CCCCCC"
+                      strokeWidth="8"
+                      fill="transparent"
+                      className="text-muted-foreground/20"
+                    />
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="54"
+                      stroke={getSearchEngineOptimizationStats().score >= 80 ? '#10b981' : getSearchEngineOptimizationStats().score >= 60 ? '#f59e0b' : '#ef4444'}
+                      strokeWidth="8"
+                      fill="transparent"
+                      strokeDasharray={`${(getSearchEngineOptimizationStats().score / 100) * 339.29} 339.29`}
+                      strokeLinecap="round"
+                      className="transition-all duration-1000"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-foreground">
+                        {getSearchEngineOptimizationStats().score}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Stats for Search Engine */}
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm text-foreground">{getSearchEngineOptimizationStats().passed} Passed</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-500" />
+                      <span className="text-sm text-foreground">{getSearchEngineOptimizationStats().warnings} Warnings</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <XCircle className="w-4 h-4 text-red-500" />
+                      <span className="text-sm text-foreground">{getSearchEngineOptimizationStats().failed} Failed</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Media Optimization */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                </svg>
+                <h3 className="text-lg font-semibold text-foreground">Social Media Optimization</h3>
+                <Badge className="ml-auto" variant={getSocialMediaOptimizationStats().score >= 80 ? "default" : getSocialMediaOptimizationStats().score >= 60 ? "secondary" : "destructive"}>
+                  {getCategoryDescription(getSocialMediaOptimizationStats().score)}
+                </Badge>
+              </div>
+              
+              <div className="flex items-center gap-6">
+                {/* Circular Progress for Social Media */}
+                <div className="relative flex-shrink-0">
+                  <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 120 120">
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="54"
+                      stroke="#CCCCCC"
+                      strokeWidth="8"
+                      fill="transparent"
+                      className="text-muted-foreground/20"
+                    />
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="54"
+                      stroke={getSocialMediaOptimizationStats().score >= 80 ? '#10b981' : getSocialMediaOptimizationStats().score >= 60 ? '#f59e0b' : '#ef4444'}
+                      strokeWidth="8"
+                      fill="transparent"
+                      strokeDasharray={`${(getSocialMediaOptimizationStats().score / 100) * 339.29} 339.29`}
+                      strokeLinecap="round"
+                      className="transition-all duration-1000"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-foreground">
+                        {getSocialMediaOptimizationStats().score}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Stats for Social Media */}
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm text-foreground">{getSocialMediaOptimizationStats().passed} Passed</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-500" />
+                      <span className="text-sm text-foreground">{getSocialMediaOptimizationStats().warnings} Warnings</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <XCircle className="w-4 h-4 text-red-500" />
+                      <span className="text-sm text-foreground">{getSocialMediaOptimizationStats().failed} Failed</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
