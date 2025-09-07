@@ -10,6 +10,7 @@ export const seoAnalyses = pgTable("seo_analyses", {
   metaDescription: text("meta_description"),
   ogTags: jsonb("og_tags").$type<Record<string, string>>(),
   twitterTags: jsonb("twitter_tags").$type<Record<string, string>>(),
+  allMetaTags: jsonb("all_meta_tags").$type<Record<string, string>>(),
   score: integer("score").notNull(),
   recommendations: jsonb("recommendations").$type<string[]>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -43,6 +44,7 @@ export interface SeoAnalysisResult {
   metaDescription: string | null;
   ogTags: Record<string, string>;
   twitterTags: Record<string, string>;
+  allMetaTags: Record<string, string>;
   score: number;
   checks: {
     title: SeoCheckResult[];
