@@ -65,27 +65,30 @@ export default function SeoAnalyzer() {
       {/* Header */}
       <header className="bg-card border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-primary text-primary-foreground p-2 rounded-lg">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center space-x-3 flex-1 min-w-0">
+              <div className="bg-primary text-primary-foreground p-2 rounded-lg flex-shrink-0">
                 <Search className="w-6 h-6" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">SEO Tag Analyzer</h1>
-                <p className="text-sm text-muted-foreground">Professional SEO Analysis Tool</p>
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">SEO Tag Analyzer</h1>
+                <p className="text-sm text-muted-foreground hidden sm:block">Professional SEO Analysis Tool</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" data-testid="button-help">
+            <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+              <Button variant="ghost" size="sm" data-testid="button-help" className="hidden sm:flex">
                 <HelpCircle className="w-5 h-5" />
               </Button>
               <Button 
                 onClick={handleExportReport}
                 disabled={!analysisResult}
                 data-testid="button-export-report"
+                size="sm"
+                className="text-xs sm:text-sm px-2 sm:px-4"
               >
-                <Download className="w-4 h-4 mr-2" />
-                Export Report
+                <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Export Report</span>
+                <span className="sm:hidden">Export</span>
               </Button>
             </div>
           </div>
@@ -103,7 +106,7 @@ export default function SeoAnalyzer() {
             
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col lg:flex-row gap-4">
                   <div className="flex-1">
                     <FormField
                       control={form.control}
@@ -126,11 +129,11 @@ export default function SeoAnalyzer() {
                       )}
                     />
                   </div>
-                  <div className="flex items-center mt-2">
+                  <div className="flex items-end lg:mt-2">
                     <Button 
                       type="submit" 
                       disabled={analyzeMutation.isPending}
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 w-full lg:w-auto"
                       data-testid="button-analyze"
                     >
                       <Search className="w-4 h-4" />
