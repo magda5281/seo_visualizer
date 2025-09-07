@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+import { CheckCircle, AlertTriangle, XCircle, Lightbulb, Target, Settings } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -104,8 +104,171 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     return `${categoryName} analysis completed`;
   };
 
+  // Helper functions for Quick Insights
+  const getGoodFindings = () => {
+    const findings = [];
+    
+    // Check meta keywords
+    const metaKeywordCheck = result.checks.metaDescription.find(check => check.name.toLowerCase().includes('keyword'));
+    if (metaKeywordCheck && metaKeywordCheck.status === "pass") {
+      findings.push("Meta keywords tag is present. While not critical for Google, it may be useful for other search engines.");
+    }
+
+    // Check viewport meta tag
+    const viewportCheck = result.checks.title.find(check => check.name.toLowerCase().includes('viewport')) || 
+                         result.checks.metaDescription.find(check => check.name.toLowerCase().includes('viewport'));
+    if (viewportCheck && viewportCheck.status === "pass") {
+      findings.push("Viewport meta tag is properly set, which is good for mobile optimization.");
+    }
+
+    // Check Open Graph tags
+    if (Object.keys(result.ogTags).length > 0) {
+      findings.push("Open Graph tags are present for optimal social sharing.");
+    }
+
+    // Check Twitter Card tags
+    if (Object.keys(result.twitterTags).length > 0) {
+      findings.push("Twitter Card tags are present for optimal social sharing.");
+    }
+
+    return findings.slice(0, 3); // Limit to top 3
+  };
+
+  const getAttentionNeeded = () => {
+    const issues = [];
+    
+    // Check title length
+    const titleCheck = result.checks.title.find(check => check.status !== "pass");
+    if (titleCheck) {
+      issues.push({
+        title: "Title Tag",
+        message: titleCheck.message,
+        priority: titleCheck.status === "fail" ? "high" : "medium"
+      });
+    }
+
+    // Check meta description
+    const metaDescCheck = result.checks.metaDescription.find(check => check.status !== "pass");
+    if (metaDescCheck) {
+      issues.push({
+        title: "Meta Description", 
+        message: metaDescCheck.message,
+        priority: metaDescCheck.status === "fail" ? "high" : "medium"
+      });
+    }
+
+    return issues.slice(0, 3); // Limit to top 3
+  };
+
+  const getPriorityRecommendations = () => {
+    const recommendations = [];
+    const issues = getAttentionNeeded();
+    
+    issues.forEach((issue, index) => {
+      recommendations.push({
+        title: `Optimize ${issue.title}`,
+        description: issue.message,
+        priority: index + 1
+      });
+    });
+
+    return recommendations.slice(0, 3); // Top 3 priorities
+  };
+
   return (
     <div className="space-y-8">
+      
+      {/* Quick SEO Insights */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Lightbulb className="w-6 h-6 text-blue-600" />
+            <h2 className="text-2xl font-bold text-foreground">Quick SEO Insights</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Key Findings - Left Side */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* What's Good */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Settings className="w-5 h-5 text-green-600" />
+                  <h3 className="text-lg font-semibold text-foreground">Key Findings</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                    <h4 className="font-medium text-green-800 dark:text-green-200 mb-3">What's Good</h4>
+                    <div className="space-y-2">
+                      {getGoodFindings().map((finding, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-500 flex-shrink-0 mt-0.5" />
+                          <span className="text-sm text-green-700 dark:text-green-300">{finding}</span>
+                        </div>
+                      ))}
+                      {getGoodFindings().length === 0 && (
+                        <span className="text-sm text-green-700 dark:text-green-300">No specific good practices detected yet.</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                    <h4 className="font-medium text-amber-800 dark:text-amber-200 mb-3">Attention Needed</h4>
+                    <div className="space-y-2">
+                      {getAttentionNeeded().map((issue, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <span className="text-sm font-medium text-amber-800 dark:text-amber-200">{issue.title}: </span>
+                            <span className="text-sm text-amber-700 dark:text-amber-300">{issue.message}</span>
+                          </div>
+                        </div>
+                      ))}
+                      {getAttentionNeeded().length === 0 && (
+                        <span className="text-sm text-amber-700 dark:text-amber-300">All checks passed! Great job.</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Priority Recommendations - Right Side */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Target className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg font-semibold text-foreground">Priority Recommendations</h3>
+              </div>
+              
+              <div className="space-y-3">
+                {getPriorityRecommendations().map((recommendation, index) => (
+                  <div key={index} className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 text-xs font-semibold rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
+                        {recommendation.priority}
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-foreground text-sm mb-1">{recommendation.title}</h4>
+                        <p className="text-xs text-muted-foreground">{recommendation.description}</p>
+                        <div className="mt-2">
+                          <Badge variant="outline" className="text-xs">
+                            Priority {recommendation.priority}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {getPriorityRecommendations().length === 0 && (
+                  <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                    <p className="text-sm text-green-700 dark:text-green-300">No critical issues found! Your SEO is looking good.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       
       {/* SEO Summary */}
       <Card>
