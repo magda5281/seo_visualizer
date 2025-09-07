@@ -34,7 +34,9 @@ export class MemStorage implements IStorage {
       ogTags: insertAnalysis.ogTags ?? null,
       twitterTags: insertAnalysis.twitterTags ?? null,
       allMetaTags: insertAnalysis.allMetaTags ?? null,
-      recommendations: insertAnalysis.recommendations ?? [],
+      recommendations: Array.isArray(insertAnalysis.recommendations) 
+        ? insertAnalysis.recommendations 
+        : [],
       id,
       createdAt: new Date(),
     };

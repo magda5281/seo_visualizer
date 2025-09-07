@@ -2,7 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
-// Validate critical environment variables
+// Validate critical environment variables and dependencies
 function validateEnvironment(): void {
   const requiredVars = ['NODE_ENV'];
   const missingVars = requiredVars.filter(varName => !process.env[varName]);
@@ -17,6 +17,28 @@ function validateEnvironment(): void {
     console.warn('WARNING: SESSION_SECRET environment variable is not set. This is recommended for production deployments.');
     // Generate a default session secret for basic functionality
     process.env.SESSION_SECRET = 'default-session-secret-' + Date.now();
+  }
+
+  console.log(`Environment validated: NODE_ENV=${process.env.NODE_ENV}`);
+}
+
+// Validate critical startup dependencies
+async function validateDependencies(): Promise<void> {
+  try {
+    // Test storage initialization
+    const { storage } = await import("./storage");
+    if (!storage) {
+      throw new Error('Storage service failed to initialize');
+    }
+    console.log('Storage service initialized successfully');
+
+    // Test schema imports
+    await import("@shared/schema");
+    console.log('Shared schemas loaded successfully');
+    
+  } catch (error) {
+    console.error('❌ Critical dependency validation failed:', error);
+    throw new Error(`Dependency validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -59,6 +81,9 @@ app.use((req, res, next) => {
   try {
     // Validate environment variables first
     validateEnvironment();
+    
+    // Validate critical dependencies
+    await validateDependencies();
     
     console.log('Starting server initialization...');
     
