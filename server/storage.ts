@@ -28,7 +28,13 @@ export class MemStorage implements IStorage {
   async createSeoAnalysis(insertAnalysis: InsertSeoAnalysis): Promise<SeoAnalysis> {
     const id = randomUUID();
     const analysis: SeoAnalysis = { 
-      ...insertAnalysis, 
+      ...insertAnalysis,
+      title: insertAnalysis.title ?? null,
+      metaDescription: insertAnalysis.metaDescription ?? null,
+      ogTags: insertAnalysis.ogTags ?? null,
+      twitterTags: insertAnalysis.twitterTags ?? null,
+      allMetaTags: insertAnalysis.allMetaTags ?? null,
+      recommendations: insertAnalysis.recommendations ?? [],
       id,
       createdAt: new Date(),
     };

@@ -107,6 +107,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         allMetaTags['theme-color'] = themeColor;
       }
 
+      // Debug: Log allMetaTags
+      console.log('allMetaTags extracted:', Object.keys(allMetaTags).length, 'tags');
+      console.log('Sample allMetaTags:', Object.entries(allMetaTags).slice(0, 3));
+
       // Perform SEO analysis
       const analysisResult = await performSeoAnalysis({
         url,
