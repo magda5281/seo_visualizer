@@ -81,14 +81,15 @@ export default function SocialPreviews({ result }: SocialPreviewsProps) {
       
       <div className="space-y-6 sm:space-y-8">
         {/* Facebook Preview */}
-        <div className="w-full">
-          <h4 className="text-base sm:text-lg font-medium text-foreground mb-3 sm:mb-4 flex items-center">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-            </svg>
-            <span className="truncate">Facebook Preview</span>
-          </h4>
-          <div className="w-full max-w-lg border border-border rounded-lg overflow-hidden bg-white" data-testid="preview-facebook">
+        <h4 className="text-base sm:text-lg font-medium text-foreground mb-3 sm:mb-4 flex items-center">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          <span className="truncate">Facebook Preview</span>
+        </h4>
+        <div className="w-full sm:flex sm:gap-2">
+     
+          <div className="w-full sm:flex-1 border border-border rounded-lg overflow-hidden bg-white" data-testid="preview-facebook">
             <img 
               src={ogImage} 
               alt="Facebook preview" 
@@ -111,7 +112,7 @@ export default function SocialPreviews({ result }: SocialPreviewsProps) {
           </div>
           
           {/* Facebook/Open Graph Tags */}
-          <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-muted rounded-lg">
+          <div className="mt-3 sm:mt-0 p-3 sm:p-4 bg-muted rounded-lg sm:flex-1">
             <h5 className="text-xs sm:text-sm font-semibold text-foreground mb-3">Open Graph Tags</h5>
             <div className="space-y-2 text-xs sm:text-sm ">
               {Object.entries(result.ogTags).length > 0 ? (
@@ -129,14 +130,15 @@ export default function SocialPreviews({ result }: SocialPreviewsProps) {
         </div>
 
         {/* Twitter Preview */}
-        <div className="w-full">
-          <h4 className="text-base sm:text-lg font-medium text-foreground mb-3 sm:mb-4 flex items-center">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-            </svg>
-            <span className="truncate">Twitter Preview</span>
-          </h4>
-          <div className="w-full max-w-lg border border-border rounded-xl overflow-hidden bg-white" data-testid="preview-twitter">
+        <h4 className="text-base sm:text-lg font-medium text-foreground mb-3 sm:mb-4 flex items-center">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+          </svg>
+          <span className="truncate">Twitter Preview</span>
+        </h4>
+        <div className="w-full sm:flex sm:gap-2">
+       
+          <div className="w-full sm:flex-1 border border-border rounded-xl overflow-hidden bg-white" data-testid="preview-twitter">
             <img 
               src={twitterImage} 
               alt="Twitter preview" 
@@ -145,7 +147,7 @@ export default function SocialPreviews({ result }: SocialPreviewsProps) {
                 e.currentTarget.src = "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400";
               }}
             />
-            <div className="p-3 sm:p-4">
+            <div className=" w-full p-3 sm:p-4  sm:flex-1">
               <h5 className="font-semibold text-gray-900 mb-1 break-words text-sm sm:text-base" data-testid="text-twitter-title">
                 {twitterTitle}
               </h5>
@@ -159,7 +161,7 @@ export default function SocialPreviews({ result }: SocialPreviewsProps) {
           </div>
           
           {/* Twitter Card Tags */}
-          <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-muted rounded-lg">
+          <div className="mt-3 sm:mt-0 p-3 sm:p-4 bg-muted rounded-lg">
             <h5 className="text-xs sm:text-sm font-semibold text-foreground mb-3">Twitter Card Tags</h5>
             <div className="space-y-2 text-xs sm:text-sm">
               {Object.entries(result.twitterTags).length > 0 ? (
