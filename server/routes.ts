@@ -48,13 +48,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
 
+      // Extract all meta tags
+      const allMetaTags: Record<string, string> = {};
+      
+      // Get title
+      if (title) {
+        allMetaTags['title'] = title;
+      }
+      
+      // Get all meta tags with name attribute
+      $('meta[name]').each((_, element) => {
+        const name = $(element).attr('name');
+        const content = $(element).attr('content');
+        if (name && content) {
+          allMetaTags[name] = content;
+        }
+      });
+      
+      // Get all meta tags with property attribute (includes og: tags)
+      $('meta[property]').each((_, element) => {
+        const property = $(element).attr('property');
+        const content = $(element).attr('content');
+        if (property && content) {
+          allMetaTags[property] = content;
+        }
+      });
+      
+      // Get all meta tags with http-equiv attribute
+      $('meta[http-equiv]').each((_, element) => {
+        const httpEquiv = $(element).attr('http-equiv');
+        const content = $(element).attr('content');
+        if (httpEquiv && content) {
+          allMetaTags[`http-equiv:${httpEquiv}`] = content;
+        }
+      });
+      
+      // Get charset
+      const charset = $('meta[charset]').attr('charset');
+      if (charset) {
+        allMetaTags['charset'] = charset;
+      }
+      
+      // Get viewport
+      const viewport = $('meta[name="viewport"]').attr('content');
+      if (viewport) {
+        allMetaTags['viewport'] = viewport;
+      }
+      
+      // Get canonical link
+      const canonical = $('link[rel="canonical"]').attr('href');
+      if (canonical) {
+        allMetaTags['canonical'] = canonical;
+      }
+      
+      // Get theme-color
+      const themeColor = $('meta[name="theme-color"]').attr('content');
+      if (themeColor) {
+        allMetaTags['theme-color'] = themeColor;
+      }
+
       // Perform SEO analysis
       const analysisResult = await performSeoAnalysis({
         url,
         title,
         metaDescription,
         ogTags,
-        twitterTags
+        twitterTags,
+        allMetaTags
       });
 
       // Store the analysis
@@ -64,6 +124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metaDescription,
         ogTags,
         twitterTags,
+        allMetaTags,
         score: analysisResult.score,
         recommendations: analysisResult.recommendations
       });
@@ -102,6 +163,7 @@ async function performSeoAnalysis(data: {
   metaDescription: string | null;
   ogTags: Record<string, string>;
   twitterTags: Record<string, string>;
+  allMetaTags: Record<string, string>;
 }): Promise<SeoAnalysisResult> {
   
   const checks: SeoAnalysisResult['checks'] = {
@@ -287,6 +349,7 @@ async function performSeoAnalysis(data: {
     metaDescription: data.metaDescription,
     ogTags: data.ogTags,
     twitterTags: data.twitterTags,
+    allMetaTags: data.allMetaTags,
     score: Math.min(score, 100),
     checks,
     recommendations
