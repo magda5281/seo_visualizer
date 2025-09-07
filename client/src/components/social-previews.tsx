@@ -1,5 +1,6 @@
 import { type SeoAnalysisResult, type SeoCheckResult } from "@shared/schema";
 import { useState } from "react";
+import Recommendations from "./recommendations";
 
 interface SocialPreviewsProps {
   result: SeoAnalysisResult;
@@ -259,6 +260,11 @@ export default function SocialPreviews({ result }: SocialPreviewsProps) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* SEO Recommendations */}
+      <div className="mt-8">
+        <Recommendations result={result} />
       </div>
     </div>
   );
