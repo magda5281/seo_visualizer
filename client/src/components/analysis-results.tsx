@@ -110,11 +110,11 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
       {/* SEO Summary */}
       <Card>
         <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8">
+          <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6 lg:gap-8">
             {/* Circular Progress and Score */}
-            <div className="flex sm:flex-col   items-center gap-6">
-              <div className="relative ">
-                <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+            <div className="flex flex-col items-center gap-4 flex-shrink-0">
+              <div className="relative">
+                <svg className="w-24 h-24 sm:w-32 sm:h-32 transform -rotate-90" viewBox="0 0 120 120">
                   {/* Background circle */}
                   <circle
                     cx="60"
@@ -140,55 +140,61 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-foreground" data-testid="text-seo-score">
+                    <div className="text-2xl sm:text-3xl font-bold text-foreground" data-testid="text-seo-score">
                       {result.score}
                     </div>
                     <div className="text-sm text-muted-foreground">/100</div>
                   </div>
                 </div>
               </div>
-              <div>
+              <div className="text-center lg:text-left">
                 <div className="text-sm text-muted-foreground mb-1">Overall SEO Score</div>
-                <div className="text-xl font-semibold text-foreground">{getScoreDescription(result.score)}</div>
+                <div className="text-lg sm:text-xl font-semibold text-foreground">{getScoreDescription(result.score)}</div>
               </div>
             </div>
 
-            {/* SEO Summary Title */}
-            <div className="flex-1 w-full">
-              <h3 className="text-2xl font-bold text-foreground mb-6">SEO Summary</h3>
+            {/* SEO Summary Title and Cards */}
+            <div className="flex-1 w-full min-w-0">
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6 text-center lg:text-left">SEO Summary</h3>
               
               {/* Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 {/* Passed Checks */}
-                <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 ">
-                  <div className="flex items-center gap-3 mb-2">
-                    <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-500" />
-                    <span className="text-sm font-medium text-green-800 dark:text-green-200">Passed Checks</span>
-                  </div>
-                  <div className="text-2xl font-bold text-green-900 dark:text-green-100" data-testid="text-passed-checks">
-                    {stats.passed}
+                <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-500 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm font-medium text-green-800 dark:text-green-200 truncate">Passed</span>
+                    </div>
+                    <div className="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-100 flex-shrink-0" data-testid="text-passed-checks">
+                      {stats.passed}
+                    </div>
                   </div>
                 </div>
 
                 {/* Warnings */}
                 <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-500" />
-                    <span className="text-sm font-medium text-amber-800 dark:text-amber-200">Warnings</span>
-                  </div>
-                  <div className="text-2xl font-bold text-amber-900 dark:text-amber-100" data-testid="text-warnings">
-                    {stats.warnings}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-500 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm font-medium text-amber-800 dark:text-amber-200 truncate">Warnings</span>
+                    </div>
+                    <div className="text-xl sm:text-2xl font-bold text-amber-900 dark:text-amber-100 flex-shrink-0" data-testid="text-warnings">
+                      {stats.warnings}
+                    </div>
                   </div>
                 </div>
 
                 {/* Failed Checks */}
                 <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <XCircle className="w-5 h-5 text-red-600 dark:text-red-500" />
-                    <span className="text-sm font-medium text-red-800 dark:text-red-200">Failed Checks</span>
-                  </div>
-                  <div className="text-2xl font-bold text-red-900 dark:text-red-100" data-testid="text-failed-checks">
-                    {stats.failed}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 dark:text-red-500 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm font-medium text-red-800 dark:text-red-200 truncate">Failed</span>
+                    </div>
+                    <div className="text-xl sm:text-2xl font-bold text-red-900 dark:text-red-100 flex-shrink-0" data-testid="text-failed-checks">
+                      {stats.failed}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -502,11 +508,11 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     <div className="space-y-2">
                       {Object.entries(result.allMetaTags).map(([key, value]) => (
                         <div key={key} className="bg-muted rounded-lg p-3 border-l-2 border-blue-500">
-                          <div className="flex items-start justify-between">
-                            <div className="font-mono text-sm text-muted-foreground min-w-0 pr-2">
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                            <div className="font-mono text-xs sm:text-sm text-muted-foreground break-words flex-shrink-0">
                               {key}
                             </div>
-                            <div className="text-sm text-foreground break-all">
+                            <div className="text-xs sm:text-sm text-foreground break-words text-right sm:flex-1 sm:ml-2">
                               {value}
                             </div>
                           </div>
@@ -517,8 +523,8 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
                   {/* Raw Tags View - shown when rawTags IS expanded */}
                   {expandedSections['rawTags'] && (
-                    <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto">
-                      <pre className="text-green-400 text-sm">
+                    <div className="bg-gray-900 rounded-lg p-3 sm:p-4 overflow-x-auto">
+                      <pre className="text-green-400 text-xs sm:text-sm whitespace-pre-wrap">
                         {result.allMetaTags && Object.entries(result.allMetaTags).map(([key, value]) => 
                           key === 'title' 
                             ? `<title>${value}</title>`
