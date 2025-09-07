@@ -113,12 +113,12 @@ export default function SocialPreviews({ result }: SocialPreviewsProps) {
           {/* Facebook/Open Graph Tags */}
           <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-muted rounded-lg">
             <h5 className="text-xs sm:text-sm font-semibold text-foreground mb-3">Open Graph Tags</h5>
-            <div className="space-y-2 text-xs sm:text-sm">
+            <div className="space-y-2 text-xs sm:text-sm ">
               {Object.entries(result.ogTags).length > 0 ? (
                 Object.entries(result.ogTags).map(([key, value]) => (
-                  <div key={key} className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
+                  <div key={key} className="flex sm:flex-row justify-between gap-1 sm:gap-2 w-full">
                     <span className="text-muted-foreground font-mono text-xs break-words flex-shrink-0">{key}:</span>
-                    <span className="text-foreground break-words text-right sm:flex-1">{value}</span>
+                    <span className="text-foreground break-words text-right sm:flex-1 ">{value}</span>
                   </div>
                 ))
               ) : (

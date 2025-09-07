@@ -22,7 +22,13 @@ export const insertSeoAnalysisSchema = createInsertSchema(seoAnalyses).omit({
 });
 
 export const urlInputSchema = z.object({
-  url: z.string().url("Please enter a valid URL starting with http:// or https://"),
+  url: z.string().min(1, "Please enter a URL").transform((val) => {
+    // If the URL doesn't start with http:// or https://, add https://
+    if (!val.startsWith('http://') && !val.startsWith('https://')) {
+      return `https://${val}`;
+    }
+    return val;
+  }).pipe(z.string().url("Please enter a valid URL")),
 });
 
 export type InsertSeoAnalysis = z.infer<typeof insertSeoAnalysisSchema>;

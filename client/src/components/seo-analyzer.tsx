@@ -65,14 +65,14 @@ export default function SeoAnalyzer() {
       {/* Header */}
       <header className="bg-card border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex  items-start sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-3 flex-1 min-w-0">
               <div className="bg-primary text-primary-foreground p-2 rounded-lg flex-shrink-0">
                 <Search className="w-6 h-6" />
               </div>
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">SEO Tag Analyzer</h1>
-                <p className="text-sm text-muted-foreground hidden sm:block">Professional SEO Analysis Tool</p>
+                <p className="text-sm text-muted-foreground ">Professional SEO Analysis Tool</p>
               </div>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
@@ -88,7 +88,7 @@ export default function SeoAnalyzer() {
               >
                 <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">Export Report</span>
-                <span className="sm:hidden">Export</span>
+                {/* <span className="sm:hidden">Export</span> */}
               </Button>
             </div>
           </div>
@@ -116,14 +116,14 @@ export default function SeoAnalyzer() {
                           <FormLabel>Website URL</FormLabel>
                           <FormControl>
                             <Input 
-                              placeholder="https://example.com" 
+                              placeholder="example.com or https://example.com" 
                               {...field}
                               data-testid="input-url"
                             />
                           </FormControl>
                           <FormMessage />
                           <p className="text-xs text-muted-foreground mt-1">
-                            Enter a valid URL starting with http:// or https://
+                            Enter any website URL - https:// will be added automatically if needed
                           </p>
                         </FormItem>
                       )}
